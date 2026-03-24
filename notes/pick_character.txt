@@ -42,7 +42,7 @@ v is real       v is not NaN
 v is finite     v is not +inf or -inf
 
 --------
-if n >= 1 and v is finite  →  k always exists in [0, n-1] after clamping
+if n >= 1 and v is finite  ->  k always exists in [0, n-1] after clamping
 --------
 
 ---------------------------------------------
@@ -51,17 +51,29 @@ if n >= 1 and v is finite  →  k always exists in [0, n-1] after clamping
 sequential - each step depends on the result of the previous step
 
 ---------------------------------------------
-3 Termination
+4 Termination
 ---------------------------------------------
 yes: it terminates by construction
-P1  receive a number       clamp — force v into [0, 1]
-P2  map it to an index     scale — map v to k
-P3  keep the index safe    guard — force k into [0, n-1]
-P4  return the character   halt  — output r_k
+
 ---------------------------------------------
-4 Steps
+5 Steps
 ---------------------------------------------
-P1  clamp - force v into [0,1]
-P2  scale - map v to k
-P3  guard - force k into [0, n-1]
-P4 return - output r_k
+P1. [Clamp.]   If v < 0 set v <- 0. If v > 1 set v <- 1.
+    what operation?   Decide + Write - clamp boundary cases
+    what is true?     v is in [0, 1]
+    where next?       -> P2
+
+P2. [Scale.]   Set k <- floor( v * (n-1) + 0.5 ).
+    what operation?   Compute - linear map [0, 1] -> [0, n-1]
+    what is true?     k is nearest integer to v * (n-1)
+    where next?       -> P3
+
+P3. [Guard.]   Set k <- min(k, n-1).
+    what operation?   Compute - guard against float rounding
+    what is true?     k is in [0, n-1]
+    where next?       -> P4
+
+P4. [Return.]  Output r_k.
+    what operation?   Halt - output result
+    what is true?     r_k is the correct character
+    where next?       -> done  ■
