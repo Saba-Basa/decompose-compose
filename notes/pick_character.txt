@@ -1,0 +1,24 @@
+given:
+v - real number, intensity  (0 = none, 1 = maximum)
+R - fixed sequence of n characters, ordered dark to light
+
+find:    
+k - integer index in [0, n-1] nearest to v * (n-1)
+r_k - the character at position k in R
+
+such that:
+v = 0    ->  k = 0
+v = 0.5  ->  k = (n-1)/2
+v = 1    ->  k = n-1
+
+2. what boundary cases:
+n=5, R = {a,b,c,d,e}
+k = nearest integer to  v * (n-1)  =  v * 4
+v = 0.0  ->  k = 0  ->  a
+v = 0.25 ->  k = 1  ->  b
+v = 0.5  ->  k = 2  ->  c
+v = 0.75 ->  k = 3  ->  d
+v = 1.0  ->  k = 4  ->  e
+for v = 0.3
+0.3 * 4 = 1.2  ->  nearest integer = 1  ->  k = 1  ->  b
+

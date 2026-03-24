@@ -1,0 +1,28 @@
+HOW TO DESIGN ONE ALGORITHM
+─────────────────────────────
+
+  1. WHAT IS THE PROBLEM?
+     Given   [what you have + constraints]
+     Find    [what you want + success condition]
+
+  2. WHAT ARE THE BOUNDARY CASES?
+     What input breaks the postcondition?
+     What must be true for the answer to exist?
+
+  3. WHAT MODEL?
+     sequential | parallel | reactive
+
+  4. DOES IT TERMINATE?
+     yes — what is the decreasing measure?
+     no  — what guarantees responsiveness?
+
+  5. WRITE THE STEPS
+     For each step ask:
+       - what operation is this?  (from Layer 2)
+       - what is the invariant after this step?
+       - where does control go next?
+
+  6. VERIFY
+     Termination  — proven by measure or fixed step count
+     Correctness  — postcondition holds at output
+     Invariant    — true at entry of every step
