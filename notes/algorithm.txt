@@ -1,0 +1,69 @@
+ALGORITHM STRUCTURE
+───────────────────
+
+  Algorithm X (Name).
+  Given [inputs], [preconditions],
+  find  [output], [postconditions].
+
+  Model:      sequential | parallel | reactive
+  Terminates: yes (with bound) | no (reactive loop)
+
+  X1. [Verb.]  Description.  (Invariant.)  → X2
+  X2. [Verb.]  Description.  (Invariant.)  → done / X3
+  X3. [Verb.]  Description.  (Invariant.)  → X4
+  X4. [Verb.]  Description.  (Invariant.)  → X2  ■
+
+
+LAYER 1 — PRIMITIVE OPERATIONS
+────────────────────────────────────────────────
+
+  Read       — observe state without changing it
+  Write      — modify state
+  Branch     — choose next step by condition
+  Halt       — stop and produce output
+
+
+LAYER 2 — PATTERN OPERATIONS
+─────────────────────────────────────────────────────
+
+  Compute      Read + Write                derive new value
+  Decide       Read + Branch               conditional path
+  Reduce       Write (shrink)              smaller problem → termination
+  Accumulate   Write (grow)                build result piece by piece
+  Transform    Read + Write                new representation, same info
+  Search       Read + Branch + loop        traverse space until found
+  Compose      Read + Read + Write         merge two results into one
+  Allocate     Write (create)              create new structure/resource
+  Randomize    Branch (nondeterministic)   choose path by random source
+  Communicate  Read/Write (boundary)       send/receive across process
+
+
+GUARANTEES (choose per model)
+─────────────────────────────
+
+  Sequential:
+    1. Termination    — proven by a decreasing measure
+    2. Correctness    — postcondition holds at Halt
+    3. Invariant      — true at every step entry
+
+  Parallel (add):
+    4. Safety         — bad states never reached
+    5. Liveness       — progress always eventually made
+
+  Reactive (replace Termination with):
+    6. Responsiveness — always eventually responds
+
+
+HOW IT WORKS
+────────────
+
+  1. Pick your model     (sequential, parallel, or reactive)
+  2. Write steps         (using pattern operations from Layer 2)
+  3. Verify guarantees   (termination, correctness, invariant)
+
+  Layer 2 patterns are built from Layer 1 primitives.
+  Layer 1 primitives are Turing-complete.
+  Therefore nothing is missing.
+
+
+════════════════════════════════════════════════════════════
