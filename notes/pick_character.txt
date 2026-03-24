@@ -11,7 +11,10 @@ v = 0    ->  k = 0
 v = 0.5  ->  k = (n-1)/2
 v = 1    ->  k = n-1
 
-2. what boundary cases:
+---------------------------------------------
+2.1 what boundary cases: (k landing outside [0,n-1]; n = 0 -> R is empty -> no characters exists)
+---------------------------------------------
+
 n=5, R = {a,b,c,d,e}
 k = nearest integer to  v * (n-1)  =  v * 4
 v = 0.0  ->  k = 0  ->  a
@@ -28,3 +31,17 @@ k > n-1  ->  v was above 1     ->  R[k] does not exist
 ---
 v = -1   ->  -1 * 4 = -4  ->  k = -4  ->  R[-4] does not exist
 v = 2    ->   2 * 4 =  8  ->  k =  8  ->  R[8]  does not exist
+n = 0    ->  R is empty  ->  no character exists at all
+
+---------------------------------------------
+2.1 What must be true
+---------------------------------------------
+n >= 1          n is a positive integer
+n is finite     n is not infinity
+v is real       v is not NaN
+v is finite     v is not +inf or -inf
+
+--------
+if n >= 1 and v is finite  →  k always exists in [0, n-1] after clamping
+--------
+
