@@ -22,3 +22,9 @@ v = 1.0  ->  k = 4  ->  e
 for v = 0.3
 0.3 * 4 = 1.2  ->  nearest integer = 1  ->  k = 1  ->  b
 
+k < 0    ->  v was negative    ->  R[k] does not exist
+k > n-1  ->  v was above 1     ->  R[k] does not exist
+
+---
+v = -1   ->  -1 * 4 = -4  ->  k = -4  ->  R[-4] does not exist
+v = 2    ->   2 * 4 =  8  ->  k =  8  ->  R[8]  does not exist
