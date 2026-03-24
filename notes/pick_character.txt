@@ -76,4 +76,11 @@ P3. [Guard.]   Set k <- min(k, n-1).
 P4. [Return.]  Output r_k.
     what operation?   Halt - output result
     what is true?     r_k is the correct character
-    where next?       -> done  ■
+    where next?       -> done
+
+---------------------------------------------
+6 Verify
+---------------------------------------------
+Termination   - 4 fixed steps, no loop
+Correctness   - k = nearest index to v * (n-1) by construction
+Postcondition - k in [0, n-1] always holds after P3
