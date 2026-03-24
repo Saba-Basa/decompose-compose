@@ -45,3 +45,8 @@ v is finite     v is not +inf or -inf
 if n >= 1 and v is finite  →  k always exists in [0, n-1] after clamping
 --------
 
+---------------------------------------------
+3 Model
+---------------------------------------------
+sequential - each step depends on the result of the previous step
+
