@@ -50,3 +50,18 @@ if n >= 1 and v is finite  →  k always exists in [0, n-1] after clamping
 ---------------------------------------------
 sequential - each step depends on the result of the previous step
 
+---------------------------------------------
+3 Termination
+---------------------------------------------
+yes: it terminates by construction
+P1  receive a number       clamp — force v into [0, 1]
+P2  map it to an index     scale — map v to k
+P3  keep the index safe    guard — force k into [0, n-1]
+P4  return the character   halt  — output r_k
+---------------------------------------------
+4 Steps
+---------------------------------------------
+P1  clamp - force v into [0,1]
+P2  scale - map v to k
+P3  guard - force k into [0, n-1]
+P4 return - output r_k
