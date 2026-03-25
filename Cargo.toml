@@ -9,9 +9,5 @@ wasm-bindgen = "0.2.114"
 [lib]
 crate-type = ["cdylib", "rlib"]
 
-[[bin]]
-name = "decompose-compose"
-path = "src/main.rs"
-
 [target.'cfg(not(target_arch = "wasm32"))'.dependencies]
 libc = "0.2.183"

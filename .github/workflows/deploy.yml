@@ -1,0 +1,49 @@
+name: Build and Deploy WASM
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  test-and-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: wasm32-unknown-unknown
+
+      - name: Run tests
+        run: cargo test
+
+      - name: Install cargo-llvm-cov
+        uses: taiki-e/install-action@cargo-llvm-cov
+
+      - name: Check coverage
+        run: |
+          cargo llvm-cov --json --output-path coverage.json
+          python3 -c "
+          import json, sys
+          data = json.load(open('coverage.json'))
+          pct = data['data'][0]['totals']['lines']['percent']
+          print(f'Line coverage: {pct:.1f}%')
+          if pct < 100.0:
+              sys.exit(1)
+          "
+
+      - name: Install wasm-pack
+        run: curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
+
+      - name: Build WASM
+        run: wasm-pack build --target web --out-dir pkg
+
+      - name: Trigger paaliaq deploy
+        uses: peter-evans/repository-dispatch@v3
+        with:
+          token: ${{ secrets.PAALIAQ_DISPATCH_TOKEN }}
+          repository: Saba-Basa/paaliaq
+          event-type: wasm-updated
+          client-payload: '{"ref": "main"}'
