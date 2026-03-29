@@ -4,6 +4,11 @@ linear mapping - scale
 rounding - nearest integer
 guard clamp - float safety
 array lookup - index into R
+-----
+precondition check    n >= 1, v finite, v not NaN
+boundary analysis     k < 0, k > n-1, n = 0
+termination     4 fixed steps, no loop
+correctness     postcondition k in [0, n-1]
 =========================================
 
 given:
