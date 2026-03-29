@@ -4,10 +4,16 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
+image = "0.24"
+rusttype = "0.9"
 wasm-bindgen = "0.2.114"
 
 [lib]
 crate-type = ["cdylib", "rlib"]
+
+[[bin]]
+name = "test"
+path = "src/test.rs"
 
 [target.'cfg(not(target_arch = "wasm32"))'.dependencies]
 libc = "0.2.183"
