@@ -1,21 +1,18 @@
-algorithm clamp
+algorithm clamp.
+given v - real number, v finite, v not NaN,
+      l - lower boundary,
+      u - upper boundary,
+find  v' - real number in [l, u].
 
-given:
-v - real number, where v finit, v not NaN
-u - upper boundary
-l - lower boundary
-find:
-v' transformed number in range of [l,u]
-
-Model: sequential
+model:      sequential
 terminates: yes
 
-[Compute + Decide] C0. [Swap.] if l>u swap l<->u. (l ≤ u.)-> C1
-[Compute + Decide] C1. lower bound if v<l set v <- l (v>=l) -> C2
-[Compute + Decide] C2. upper bound if v>=u set v<- u. (v in [l,u])-> done.
+[decide]           C0. [guard.]       if v not finite return None.  (v finite.)   → C1
+[compute + Decide] C1. [Sswap.]        if l > u swap l ↔ u.         (l ≤ u.)      → C2
+[compute + Decide] C2. [lower bound.] if v < l set v ← l.          (v ≥ l.)      → C3
+[compute + Decide] C3. [upper bound.] if v > u set v ← u.          (v ∈ [l,u].)  → done
 
-----
 verify
-termination: 3 fixed steps, no loop
-correctness: v ∈ [l,u] holds after C2
-invariant: l ≤ u at entry of C1, v ≥ l at entry of C2
+termination:  4 fixed steps, no loop
+correctness:  v ∈ [l,u] holds after C3
+invariant:    v finite at C2 · l ≤ u at C2 · v ≥ l at C3
