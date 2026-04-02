@@ -2,17 +2,20 @@ algorithm clamp
 
 given:
 v - real number, where v finit, v not NaN
+u - upper boundary
+l - lower boundary
 find:
-v' transformed number in range of [0,1]
+v' transformed number in range of [l,u]
 
 Model: sequential
 terminates: yes
 
-[Compute + Decide] C1. lower bound if v<0 set v <- 0 (v>=0) -> C2
-[Compute + Decide] C2. upper bound if v>1 set v<- 1. (v in [0,1])-> done.
+[Compute + Decide] C0. [Swap.] if l>u swap l<->u. (l ≤ u.)-> C1
+[Compute + Decide] C1. lower bound if v<l set v <- l (v>=l) -> C2
+[Compute + Decide] C2. upper bound if v>=u set v<- u. (v in [l,u])-> done.
 
 ----
 verify
-termination: 2 fixed steps.
-correctnes: v in [0,1] holds after C2
-invariation: v>=0 at entry of C2
+termination: 3 fixed steps, no loop
+correctness: v ∈ [l,u] holds after C2
+invariant: l ≤ u at entry of C1, v ≥ l at entry of C2
