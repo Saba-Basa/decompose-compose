@@ -1,0 +1,19 @@
+Algorithm L (Lookup).
+Given v - real number, intensity, v finite, v not NaN,
+      R - fixed sequence of n characters, ordered dark to light,
+      n - length of R, n >= 1,
+find  r_k - character at position k in R,
+      where k is the integer in [0, n-1] nearest to v * (n-1).
+
+Model:      sequential
+Terminates: yes
+
+[Compute + Decide] L1. [Clamp.]  call C(v, 0, 1) -> v'.           (v' ∈ [0,1].)        -> L2
+[Compute]          L2. [Scale.]  set k <- round(v' * (n-1)).      (k nearest index.)    -> L3
+[Compute]          L3. [Guard.]  set k <- min(k, n-1).            (k ∈ [0, n-1].)       -> L4
+[Halt]             L4. [Return.] output R[k].                     (r_k is correct.)     -> done  ■
+
+verify
+termination:  4 fixed steps, no loop
+correctness:  R[k] exists and k ∈ [0, n-1] holds after L3
+invariant:    v' ∈ [0,1] at L2 · k nearest index at L3

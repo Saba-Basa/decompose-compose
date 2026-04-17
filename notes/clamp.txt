@@ -7,10 +7,10 @@ find  v' - real number in [l, u].
 model:      sequential
 terminates: yes
 
-[decide]           C0. [guard.]       if v not finite return None.  (v finite.)   → C1
-[compute + Decide] C1. [Sswap.]        if l > u swap l ↔ u.         (l ≤ u.)      → C2
-[compute + Decide] C2. [lower bound.] if v < l set v ← l.          (v ≥ l.)      → C3
-[compute + Decide] C3. [upper bound.] if v > u set v ← u.          (v ∈ [l,u].)  → done
+[decide]           C0. [guard.]       if v not finite return None.  (v finite.)   -> C1
+[compute + Decide] C1. [Sswap.]        if l > u swap l <-> u.         (l ≤ u.)      -> C2
+[compute + Decide] C2. [lower bound.] if v < l set v <- l.          (v ≥ l.)      -> C3
+[compute + Decide] C3. [upper bound.] if v > u set v <- u.          (v ∈ [l,u].)  -> done
 
 verify
 termination:  4 fixed steps, no loop
