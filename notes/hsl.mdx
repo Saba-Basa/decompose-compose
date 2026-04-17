@@ -1,0 +1,233 @@
+# HSL — Hue, Saturation, Lightness
+
+A cylindrical reparameterization of the RGB cube into three perceptually meaningful axes: which color, how vivid, how bright.
+
+The modern "HSL" model is a later standardization of one of the cylindrical color spaces presented in Joblove \& Greenberg (1978). The paper itself never uses the acronym "HSL"; it presents three related cylindrical spaces and refers to the third axis as **intensity** rather than lightness. What we now call HSL maps most closely to their **hue / relative chroma / intensity** space (their Figure 7, eq. 4).
+
+---
+
+## Definition
+
+A color is specified by three coordinates:
+
+$$
+\text{hsl}(H, S, L), \qquad H \in [0°, 360°), \quad S \in [0, 1], \quad L \in [0, 1]
+$$
+
+| Symbol | Name       | Range          | Meaning                                  |
+| ------ | ---------- | -------------- | ---------------------------------------- |
+| $H$    | Hue        | $[0°, 360°)$   | Position on the color wheel              |
+| $S$    | Saturation | $[0, 1]$       | Distance from the gray axis              |
+| $L$    | Lightness  | $[0, 1]$       | Distance from black ($0$) to white ($1$) |
+
+In CSS the same triple is written `hsl(H, S%, L%)` or `hsl(H S% L% / A)` with optional alpha $A \in [0, 1]$.
+
+*Note on units:* the original paper uses the hue angle as **revolutions modulo 1** (range 0 to 1), not degrees. The 0°–360° convention used here is the later standardized form.
+
+---
+
+## The Three Axes
+
+### Hue --- *which color*
+
+A position on a circle. The wheel is divided into six $60°$ sectors anchored at the RGB primaries and their pairwise mixes:
+
+| $H$    | $0°$ | $60°$  | $120°$ | $180°$ | $240°$ | $300°$  |
+| ------ | ---- | ------ | ------ | ------ | ------ | ------- |
+| Color  | Red  | Yellow | Green  | Cyan   | Blue   | Magenta |
+
+Hue is **cyclic**: $H \equiv H + 360°$.
+
+The original paper motivates this directly: since hue is "a circular or modular quality, while all the other characteristics ... imply the existence of minimum and maximum values, points in any color space related to these qualities may be specified by cylindrical coordinates" (Joblove \& Greenberg 1978, p. 21).
+
+The paper also offers two interpolation choices for hue: a piecewise linear one (their eq. 2), which produces visible **Mach banding** at the breakpoints, and a sinusoidal one (their eq. 3) that eliminates it.
+
+### Saturation --- *how vivid*
+
+Measures how far the color is from the central gray axis.
+
+* $S = 0$ → gray (hue is irrelevant)
+* $S = 1$ → pure spectral color
+
+The paper carefully distinguishes two terms that are often conflated:
+
+> "Chroma" is colorfulness judged with reference to white or the general level of surrounding illumination; the "saturation" of a color is its colorfulness judged with respect to its lightness. Thus pure monochromatic red light of low intensity or lightness has very high saturation but low chroma.
+> --- Joblove \& Greenberg 1978, p. 22
+
+What modern HSL calls *saturation* is, strictly, **relative chroma** in the paper's terminology (their Figure 7).
+
+### Lightness --- *how bright*
+
+Measures distance from black to white along the central axis.
+
+* $L = 0$ → black (regardless of $H$, $S$)
+* $L = 0.5$ → most vivid form of the hue (when $S = 1$)
+* $L = 1$ → white (regardless of $H$, $S$)
+
+The paper calls this axis **intensity**, not lightness, and defines the gray axis as a "straight line (the cylindrical axis) from black to white" with the maximum-chroma colors located on a circle "perpendicularly intersecting it halfway between the black point and the white point" (p. 22).
+
+---
+
+## Geometry
+
+HSL space, in the paper's framing, is a **bicone** (their Figure 5, hue/chroma/intensity), or equivalently a **cylinder** when chroma is normalized to its maximum-achievable value at each (hue, intensity) pair (their Figure 7, hue/relative chroma/intensity):
+
+```{=latex}
+\begin{center}
+\begin{tikzpicture}[scale=1.0]
+  % vertical axis
+  \draw[->] (0,-2.0) -- (0,2.2) node[above] {\small $L$};
+  % top cone
+  \draw (-1.2,0) -- (0,2.0) -- (1.2,0);
+  % bottom cone
+  \draw (-1.2,0) -- (0,-2.0) -- (1.2,0);
+  % equator ellipse
+  \draw[dashed] (0,0) ellipse (1.2 and 0.35);
+  % labels
+  \node[right] at (0.08, 1.85)  {\small white ($L=1$)};
+  \node[right] at (0.08,-1.85)  {\small black ($L=0$)};
+  \node[right] at (1.25, 0)     {\small max chroma ($L=0.5$)};
+  % S arrow
+  \draw[->] (0,0) -- (1.2,0) node[midway, above] {\small $S$};
+\end{tikzpicture}
+\end{center}
+```
+
+* $H$ → angle around the central axis
+* $S$ → radius from the axis
+* $L$ → height along the axis
+
+The paper notes that in the **cylindrical** (relative-chroma) version, "the relative chroma is undefined" at the black and white bases (p. 22) --- the modern convention sets $S = 0$ there by fiat.
+
+---
+
+## Conversion: HSL → RGB (the paper's formula)
+
+The paper gives the transformation from hue / relative chroma / intensity back to RGB as **eq. 4** (Joblove \& Greenberg 1978, p. 22):
+
+$$
+[r\;g\;b] =
+\begin{cases}
+\big([.5\;.5\;.5] + c \cdot ([r'\;g'\;b'] - [.5\;.5\;.5])\big) \cdot 2i & \text{if } i < 1/2 \\[6pt]
+[.5\;.5\;.5] + c \cdot ([r'\;g'\;b'] - [.5\;.5\;.5]) \\
+\quad + \big([.5\;.5\;.5] - c \cdot ([r'\;g'\;b'] - [.5\;.5\;.5])\big) \cdot (2 - 2i) & \text{if } i \ge 1/2
+\end{cases}
+$$
+
+where $c$ is the relative chroma, $i$ is the intensity (each in $[0, 1]$), and $[r'\;g'\;b']$ is the pure (maximum-chroma) RGB triple for the given hue, computed via their hue-to-rgb equations 2 (linear) or 3 (sinusoidal).
+
+---
+
+## Conversion: RGB → HSL (modern standard form)
+
+The reverse direction is **not given in this form** in the 1978 paper. The compact closed-form widely used today --- given $(R, G, B) \in [0, 1]^3$, $M = \max$, $m = \min$, $C = M - m$:
+
+$$
+L = \frac{M + m}{2}, \qquad
+S =
+\begin{cases}
+0 & \text{if } C = 0 \\[2pt]
+\dfrac{C}{1 - |2L - 1|} & \text{otherwise}
+\end{cases}
+$$
+
+$$
+H = 60° \times
+\begin{cases}
+0 & \text{if } C = 0 \\[2pt]
+((G - B)/C) \bmod 6 & \text{if } M = R \\[2pt]
+(B - R)/C + 2 & \text{if } M = G \\[2pt]
+(R - G)/C + 4 & \text{if } M = B
+\end{cases}
+$$
+
+--- comes from later standardization (W3C / CSS Color Module) and **does not appear in the Joblove \& Greenberg paper**. It is consistent with their model but uses a different parameterization.
+
+The paper *does* give one closed-form saturation expression, but it belongs to their **hue / saturation / value** space (Figure 9, eq. 5), not the relative-chroma space:
+
+$$
+s = \frac{\max(r, g, b) - \min(r, g, b)}{\max(r, g, b)}
+$$
+
+This is the formula for what we now call HSV saturation, not HSL saturation. Worth flagging because it is sometimes misattributed.
+
+**Check (modern form):** pure red $(1, 0, 0)$ gives $M = 1$, $m = 0$, $C = 1$, so $L = 0.5$, $S = 1$, $H = 0°$ $\Rightarrow$ $\text{hsl}(0, 100\%, 50\%)$. $\checkmark$
+
+---
+
+## Reference Colors
+
+| Color   | HSL                       | Hex       |
+| ------- | ------------------------- | --------- |
+| Red     | `hsl(0, 100%, 50%)`       | `#FF0000` |
+| Yellow  | `hsl(60, 100%, 50%)`      | `#FFFF00` |
+| Green   | `hsl(120, 100%, 50%)`     | `#00FF00` |
+| Cyan    | `hsl(180, 100%, 50%)`     | `#00FFFF` |
+| Blue    | `hsl(240, 100%, 50%)`     | `#0000FF` |
+| Magenta | `hsl(300, 100%, 50%)`     | `#FF00FF` |
+| White   | `hsl(0, 0%, 100%)`        | `#FFFFFF` |
+| Black   | `hsl(0, 0%, 0%)`          | `#000000` |
+| Gray    | `hsl(0, 0%, 50%)`         | `#808080` |
+
+---
+
+## Why a Cylindrical Space (and not just RGB)
+
+RGB is how displays produce light; HSL is how people **think and talk** about color. The paper opens its motivation with exactly this observation:
+
+> Because most people are not familiar with additive primary mixing, rgb space is not always suitable for applications when the user is composing colors. ... Most viewers, though, first notice a color's hue and then characteristics which might be described as lightness, brightness, brilliance, strength, saturation, vividness, purity, etc. ... For interactive purposes, then, a system of specifying colors based on such qualities would be most natural for a naive user.
+> --- Joblove \& Greenberg 1978, p. 21
+
+Each axis maps to a property a designer wants to vary independently:
+
+* Tints \& shades --- fix $H$, $S$; vary $L$
+* Muted vs vivid --- fix $H$, $L$; vary $S$
+* Complement --- $H \mathrel{+}= 180°$
+* Triadic --- $H \mathrel{\pm}= 120°$
+* Analogous --- $H \mathrel{\pm}= 30°$
+* Dark mode --- $L \leftarrow 1 - L$ (keep $H$, $S$)
+
+The paper also notes a separate computational benefit: **linear paths** through cylindrical color spaces give better visual results than linear paths through RGB. For example, a series of intermediate colors interpolated linearly in RGB tends to wash out --- "in any of the latter [cylindrical] spaces, all of the intermediate colors could have the same saturation as the end colors; whereas in rgb space, they would be paler" (p. 25). The same applies to simulating atmospheric haze, specular highlights, and chromatic filtration.
+
+---
+
+## The Three Spaces in the Paper (quick map)
+
+The paper actually defines **three** related cylindrical spaces, not one. Worth keeping straight:
+
+| Paper's name                               | Figure | Third axis  | Radial axis      | Solid shape        |
+| ------------------------------------------ | ------ | ----------- | ---------------- | ------------------ |
+| Hue / chroma / intensity                   | Fig. 5 | intensity   | absolute chroma  | bicone             |
+| Hue / relative chroma / intensity          | Fig. 7 | intensity   | relative chroma  | cylinder           |
+| Hue / saturation / value                   | Fig. 9 | value       | saturation       | cylinder (HSV)     |
+
+Modern **HSL** corresponds to the second (Figure 7).
+Modern **HSV** corresponds to the third (Figure 9).
+
+---
+
+## Caveats
+
+1. **Not perceptually uniform.** Equal numerical $\Delta L$ does not produce equal perceived brightness change. Yellow at $L = 0.5$ looks much brighter than blue at $L = 0.5$. The paper does not claim perceptual uniformity --- it only claims naturalness for *user specification* of color.
+2. **Device-dependent.** Defined relative to the display's RGB primaries; the paper notes that "the colors which are of maximum chroma for their respective hues" are defined "for the given rgb display space" (p. 22).
+3. **The "HSL" name is later.** The paper uses **intensity**, **chroma**, **relative chroma**, **saturation**, and **value** as carefully distinguished technical terms. Modern usage of "HSL saturation" and "HSL lightness" collapses some of these distinctions.
+
+---
+
+## Source
+
+**Joblove, G. H., \& Greenberg, D.** (1978). *Color Spaces for Computer Graphics.* Program of Computer Graphics, Cornell University. Published in *ACM SIGGRAPH Computer Graphics*, 12(3), August 1978, pp. 20--25.
+
+Specific cross-references used in this note:
+
+| Topic                                       | Location in paper      |
+| ------------------------------------------- | ---------------------- |
+| Motivation for cylindrical coordinates      | p. 21                  |
+| Hue as revolutions mod 1; linear interp.    | p. 22, eq. 2           |
+| Sinusoidal hue interpolation (no banding)   | p. 22, eq. 3           |
+| Chroma vs saturation, formal distinction    | p. 22                  |
+| Biconical hue/chroma/intensity space        | Figure 5               |
+| Cylindrical hue/relative chroma/intensity   | Figure 7, eq. 4        |
+| HSV: hue/saturation/value space             | Figure 9, eq. 5--6     |
+| Mach banding from linear hue interpolation  | p. 22, Figure 4a       |
+| Cylindrical paths beat RGB paths visually   | p. 25                  |
